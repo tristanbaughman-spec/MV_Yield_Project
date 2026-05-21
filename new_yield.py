@@ -28,7 +28,7 @@ col1, col2, col3 = st.columns(3)
 
 col1.metric("Accept Flow", f"{accept_flow:.2f} g/min")
 col2.metric("Reject Flow", f"{reject_flow:.2f} g/min")
-col3.metric("Yield", f"{yield_pct:.2f}%")
+col3.metric("YIELD", f"{yield_pct:.2f}%")
 
 # Dataframe
 df = pd.DataFrame({
