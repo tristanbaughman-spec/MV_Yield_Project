@@ -22,6 +22,7 @@ with logo_col:
     except Exception:
         pass
 
+
 # -----------------------------
 # CALCULATIONS
 # -----------------------------
@@ -43,12 +44,12 @@ def calculate_yield(input_flow, Gi_pct, Ga_pct, Gr_pct):
     accept_flow = input_flow * ((Gi - Gr) / (Ga - Gr))
     reject_flow = input_flow * ((Ga - Gi) / (Ga - Gr))
 
-    good_in_accept = Ga * accept_flow
     good_in_input = Gi * input_flow
+    good_in_accept = Ga * accept_flow
 
     yield_pct = (good_in_accept / good_in_input) * 100
 
-    return accept_flow, reject_flow, yield_pct
+    return accept_flow, reject_flow, yield_pct, good_in_accept, good_in_input
 
 
 def linear_yield_model(x, x1, y1, x2, y2):
@@ -159,35 +160,8 @@ with tab2:
 with tab3:
     st.subheader("Yield Results")
 
-#yield by weight
-def calculate_yield(input_flow, Gi_pct, Ga_pct, Gr_pct):
-    Gi = Gi_pct / 100
-    Ga = Ga_pct / 100
-    Gr = Gr_pct / 100
-
-    if input_flow <= 0:
-        raise ValueError("Input flow must be greater than 0.")
-
-    if Gi <= 0:
-        raise ValueError("Input Good % must be greater than 0.")
-
-    if Ga == Gr:
-        raise ValueError("Accept Good % and Reject Good % cannot be the same.")
-
-    accept_flow = input_flow * ((Gi - Gr) / (Ga - Gr))
-    reject_flow = input_flow * ((Ga - Gi) / (Ga - Gr))
-
-    good_in_input = Gi * input_flow
-    good_in_accept = Ga * accept_flow
-
-    yield_pct = (good_in_accept / good_in_input) * 100
-
-    return accept_flow, reject_flow, yield_pct, good_in_accept, good_in_input
-
-##
-
     try:
-        accept_1, reject_1, yield_1 = calculate_yield(
+        accept_1, reject_1, yield_1, good_accept_1, good_input_1 = calculate_yield(
             input_flow_1,
             Gi_1,
             Ga_1,
@@ -199,17 +173,20 @@ def calculate_yield(input_flow, Gi_pct, Ga_pct, Gr_pct):
             "Input Flow": input_flow_1,
             "Accept Flow": accept_1,
             "Reject Flow": reject_1,
+            "Good Input Weight": good_input_1,
+            "Good Yield by Weight": good_accept_1,
             "Yield %": yield_1,
         }]
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
 
         col1.metric("Run 1 Yield", f"{yield_1:.2f}%")
-        col2.metric("Run 1 Accept Flow", f"{accept_1:.2f}")
-        col3.metric("Run 1 Reject Flow", f"{reject_1:.2f}")
+        col2.metric("Run 1 Good Yield by Weight", f"{good_accept_1:.2f}")
+        col3.metric("Run 1 Accept Flow", f"{accept_1:.2f}")
+        col4.metric("Run 1 Reject Flow", f"{reject_1:.2f}")
 
         if use_run_2:
-            accept_2, reject_2, yield_2 = calculate_yield(
+            accept_2, reject_2, yield_2, good_accept_2, good_input_2 = calculate_yield(
                 input_flow_2,
                 Gi_2,
                 Ga_2,
@@ -217,41 +194,60 @@ def calculate_yield(input_flow, Gi_pct, Ga_pct, Gr_pct):
             )
 
             yield_difference = yield_2 - yield_1
+            good_yield_difference = good_accept_2 - good_accept_1
 
             results.append({
                 "Run": "Run 2",
                 "Input Flow": input_flow_2,
                 "Accept Flow": accept_2,
                 "Reject Flow": reject_2,
+                "Good Input Weight": good_input_2,
+                "Good Yield by Weight": good_accept_2,
                 "Yield %": yield_2,
             })
 
             st.divider()
 
-            col4, col5, col6 = st.columns(3)
+            col5, col6, col7, col8 = st.columns(4)
 
-            col4.metric("Run 2 Yield", f"{yield_2:.2f}%")
-            col5.metric("Run 2 Accept Flow", f"{accept_2:.2f}")
-            col6.metric("Yield Difference", f"{yield_difference:.2f}%")
+            col5.metric("Run 2 Yield", f"{yield_2:.2f}%")
+            col6.metric("Run 2 Good Yield by Weight", f"{good_accept_2:.2f}")
+            col7.metric("Yield Difference", f"{yield_difference:.2f}%")
+            col8.metric("Good Yield Weight Difference", f"{good_yield_difference:.2f}")
 
         results_df = pd.DataFrame(results)
 
         st.dataframe(results_df, use_container_width=True)
 
-        fig_bar = px.bar(
+        fig_bar_pct = px.bar(
             results_df,
             x="Run",
             y="Yield %",
             text="Yield %",
-            title="Yield Result" if not use_run_2 else "Yield Comparison"
+            title="Yield % Result" if not use_run_2 else "Yield % Comparison"
         )
 
-        fig_bar.update_traces(
+        fig_bar_pct.update_traces(
             texttemplate="%{text:.2f}%",
             textposition="outside"
         )
 
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar_pct, use_container_width=True)
+
+        fig_bar_weight = px.bar(
+            results_df,
+            x="Run",
+            y="Good Yield by Weight",
+            text="Good Yield by Weight",
+            title="Good Yield by Weight" if not use_run_2 else "Good Yield by Weight Comparison"
+        )
+
+        fig_bar_weight.update_traces(
+            texttemplate="%{text:.2f}",
+            textposition="outside"
+        )
+
+        st.plotly_chart(fig_bar_weight, use_container_width=True)
 
         if use_run_2:
             st.subheader("Estimated Yield Curve")
