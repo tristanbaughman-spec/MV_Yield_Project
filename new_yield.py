@@ -82,3 +82,94 @@ with tab3:
     )
 
     st.plotly_chart(fig2, use_container_width=True)
+
+    ###plotly
+
+
+import streamlit as st  
+import plotly.graph_objects as go  
+import numpy as np  
+  
+def get_throughput_rate(time_seconds, grams=10012):  
+    """Calculate throughput in grams per second."""  
+    return grams / time_seconds  
+  
+def linear_yield_model(time_seconds):  
+    """Linear interpolation between the two data points."""  
+    t1, y1 = 30, 94.0  
+    t2, y2 = 15, 86.4  
+    slope = (y2 - y1) / (t2 - t1)  
+    yield_pct = y1 + slope * (time_seconds - t1)  
+    return yield_pct  
+  
+def create_yield_curve_with_point(time_seconds):  
+    """Create chart with curve and current slider position."""  
+    time_range = np.linspace(15, 30, 100)  
+    yields = [linear_yield_model(t) for t in time_range]  
+    throughputs = [get_throughput_rate(t) for t in time_range]  
+      
+    fig = go.Figure()  
+      
+    fig.add_trace(go.Scatter(  
+        x=time_range,  
+        y=yields,  
+        mode='lines',  
+        name='Yield Curve',  
+        line=dict(width=3),  
+        hovertemplate='Time: %{x:.1f}s<br>Yield: %{y:.1f}%<br>Throughput: %{customdata:.1f} g/s<extra></extra>',  
+        customdata=throughputs  
+    ))  
+      
+    fig.add_trace(go.Scatter(  
+        x=[30, 15],  
+        y=[94.0, 86.4],  
+        mode='markers',  
+        name='Measured Points',  
+        marker=dict(size=10, line=dict(width=2, color='white')),  
+        hovertemplate='Time: %{x}s<br>Yield: %{y}%<extra></extra>'  
+    ))  
+      
+    yield_pct = linear_yield_model(time_seconds)  
+    fig.add_trace(go.Scatter(  
+        x=[time_seconds],  
+        y=[yield_pct],  
+        mode='markers',  
+        name='Current Selection',  
+        marker=dict(size=15, symbol='diamond', line=dict(width=2, color='white')),  
+        hovertemplate='Time: %{x:.1f}s<br>Yield: %{y:.1f}%<extra></extra>'  
+    ))  
+      
+    fig.update_xaxes(title_text="Time (seconds)", automargin=True)  
+    fig.update_yaxes(title_text="Yield (%)", automargin=True)  
+    fig.update_layout(hovermode='closest', showlegend=True)  
+      
+    return fig  
+  
+# Main app  
+st.title("Throughput & Yield Analysis")  
+  
+time_seconds = st.slider(  
+    "Processing Time (seconds)",  
+    min_value=15.0,  
+    max_value=30.0,  
+    value=22.5,  
+    step=0.5  
+)  
+  
+throughput = get_throughput_rate(time_seconds)  
+yield_pct = linear_yield_model(time_seconds)  
+  
+col1, col2, col3 = st.columns(3)  
+  
+with col1:  
+    st.metric("Processing Time", f"{time_seconds:.1f}s")  
+  
+with col2:  
+    st.metric("Throughput", f"{throughput:.1f} g/s")  
+  
+with col3:  
+    st.metric("Yield", f"{yield_pct:.1f}%")  
+  
+fig = create_yield_curve_with_point(time_seconds)  
+st.plotly_chart(fig, use_container_width=True)  
+  
