@@ -4,6 +4,7 @@ import streamlit as st
 
 st.title("Optical Sorting Yield Dashboard")
 
+
 # User Inputs
 input_flow = st.number_input("Input Flow (g/min)", value=1000.0)
 

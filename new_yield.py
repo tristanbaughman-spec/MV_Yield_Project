@@ -6,6 +6,22 @@ import numpy as np
 
 st.set_page_config(page_title="Yield Dashboard", layout="wide")
 
+# ------------------------------------------------
+# PAGE HEADER
+# ------------------------------------------------
+
+title_col, logo_col = st.columns([5, 1])
+
+with title_col:
+    st.title("MV360 & 3U USA Analysis Dashboard")
+
+with logo_col:
+    try:
+        st.image("assets/3U-Vision-USAdarksilhouette.png", width=200)
+        st.image("assets/Logotipo-MachVision-spanish-1.png", width=200)
+    except Exception:
+        pass
+
 st.title("Throughput & Yield Analysis Dashboard")
 
 
