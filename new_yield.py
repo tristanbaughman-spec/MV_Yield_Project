@@ -13,7 +13,7 @@ st.set_page_config(page_title="Yield Dashboard", layout="wide")
 title_col, logo_col = st.columns([5, 1])
 
 with title_col:
-    st.title("MV360 & 3U USA Throughput & Yield Analysis Dashboard")
+    st.title("MV360 & 3U USA Yield Calculator")
 
 with logo_col:
     try:
