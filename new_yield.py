@@ -159,6 +159,33 @@ with tab2:
 with tab3:
     st.subheader("Yield Results")
 
+#yield by weight
+def calculate_yield(input_flow, Gi_pct, Ga_pct, Gr_pct):
+    Gi = Gi_pct / 100
+    Ga = Ga_pct / 100
+    Gr = Gr_pct / 100
+
+    if input_flow <= 0:
+        raise ValueError("Input flow must be greater than 0.")
+
+    if Gi <= 0:
+        raise ValueError("Input Good % must be greater than 0.")
+
+    if Ga == Gr:
+        raise ValueError("Accept Good % and Reject Good % cannot be the same.")
+
+    accept_flow = input_flow * ((Gi - Gr) / (Ga - Gr))
+    reject_flow = input_flow * ((Ga - Gi) / (Ga - Gr))
+
+    good_in_input = Gi * input_flow
+    good_in_accept = Ga * accept_flow
+
+    yield_pct = (good_in_accept / good_in_input) * 100
+
+    return accept_flow, reject_flow, yield_pct, good_in_accept, good_in_input
+
+##
+
     try:
         accept_1, reject_1, yield_1 = calculate_yield(
             input_flow_1,
