@@ -6,14 +6,6 @@ import numpy as np
 
 st.set_page_config(page_title="Yield Dashboard", layout="wide")
 
-from streamlit_extras.let_it_rain import *
-
-rain(
-    emoji="🥜",
-    font_size=54,
-    falling_speed=5,
-    animation_length="infinite",
-)
 
 # ------------------------------------------------
 # PAGE HEADER
