@@ -4,15 +4,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-from streamlit_extras.let_it_rain import rain
-
-def example() -> None:
-    rain(
-        emoji="🎈",
-        font_size=54,
-        falling_speed=5,
-        animation_length="infinite",
-    )
 
 st.set_page_config(page_title="Yield Dashboard", layout="wide")
 
