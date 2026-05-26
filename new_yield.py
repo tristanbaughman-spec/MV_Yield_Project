@@ -1,10 +1,3 @@
-from streamlit_extras.let_it_rain import rain
-rain(
-    emoji="🎈",
-    font_size=54,
-    falling_speed=5,
-    animation_length="infinite",
-)
 import streamlit as st
 import pandas as pd
 import plotly.express as px
